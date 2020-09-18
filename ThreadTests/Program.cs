@@ -11,111 +11,7 @@ using System.Threading;
 
 namespace ThreadTests
 {
-    /*
-    class QueuePublisher
-    {
-        IConnection _connection;
-        IModel channel;
-        int _target;
-        // When an instance is created, the target number needs to be specified
-        public QueuePublisher(int target, IConnection connection)
-        {
-            // The targer number is then stored in the class private variable _target
-            this._target = target;
-            _connection = connection;
-            channel = connection.CreateModel();
-            channel.QueueDeclare(queue: "hello", durable: false, exclusive: false, autoDelete: false, arguments: null);
-        }
-        // Function prints the numbers from 1 to the traget number that the user provided
-        public void Publish()
-        {
-            var tickStart = Environment.TickCount64;
-            string message = "sdjhflsdkjhflsadkfhsldjfhsdlkjfhsdlkjfhsdlkjfhsdlkjfhsdlkjfhsdlkfjhdlkjgfhdljghdlghsdlfkjghdlkgjhdflkjghdlkjghdljghdlfkjghdlskjghdlkjghdlfkjghdlkjghdlkfjghdslfkjghdslkfjghdlskjghdlkgjhdflkjghdlfkjghdlkfjghdflkgjhdsflkjghdlfkgjhdlfjghdslkgjhdslgjhdslgjhsdlgjhdslkgjhdslkgjhdlkgjhdlfjghdlfkjghdlkfjghdlfgjhdlfkjghldfjghlsdfjghdlfgjhdslkfgjhdlkfjghdslkfhgdlkfsjghdslkfjghldksfjghdlfkgjhdlskfgjhdlkgjhdslkjghdslkjghldskjghlsdkgjhsdlkghsdlkghdslkfghjdlfjghdlfjghldfjghldkhglksdjhgfsdljhgsldkgjhdslkgjhdslfkjghdslkfgjhsdlkgjhsdlkfgjhsdlfkjghdslfkjghsdlkgjhdslkfjghdslkfjghdslkfjghdsklfjghdslfkjghdflkjghsldkgjhdslkfgjhsdlkgjhdlkfgjhdlgkjhdlkfgjhdflkgjhdflkgjhdlkgjhdglkjhglkdfsjhgdlfkjghldskjghdslkjgfhsdklfjghdlkfjghdlfkjghslkgjhdlfkjghsdlkfjgh";
-            var body = Encoding.UTF8.GetBytes(message);
-            for (int x = 0; x <= _target; x++)
-            {
-                channel.BasicPublish(exchange: "", routingKey: "hello", basicProperties: null, body: body);
-            }
-            var tickEnd = Environment.TickCount64;
-            Console.WriteLine($"Published {_target} messages in {tickEnd-tickStart} ms");
-        }
-    }
-
-
-    class QueueConsumer
-    {
-        IConnection _target;
-        IModel channel;
-        CountdownEvent _countdown;
-        // When an instance is created, the target number needs to be specified
-        public QueueConsumer(IConnection connection, CountdownEvent countdown)
-        {
-            // The targer number is then stored in the class private variable _target
-            this._target = connection;
-            _countdown = countdown;
-            channel = connection.CreateModel();
-            channel.QueueDeclare(queue: "hello", durable: false, exclusive: false, autoDelete: false, arguments: null);
-        }
-        // Function prints the numbers from 1 to the traget number that the user provided
-        public void Listen()
-        {
-            var consumer = new EventingBasicConsumer(channel);
-            consumer.Received += (model, ea) =>
-            {
-                var body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-                _countdown.Signal();
-            };
-            channel.BasicConsume(queue: "hello", autoAck: true, consumer: consumer);
-
-        }
-    }
-
-
-    class Program
-    {
-        static CountdownEvent _countdown;
-        
-        static void Main(string[] args)
-        {
-            var factory = new ConnectionFactory();
-            factory.HostName = "localhost";
-            var connection = factory.CreateConnection();
-
-            Console.WriteLine("Enter number of messages to test with");
-            int target = Convert.ToInt32(Console.ReadLine());
-            int numOfPublishThreads = 1;
-            int numOfConsumerThreads = 2;
-            _countdown =  new CountdownEvent(target* numOfPublishThreads);
-        
-            Console.WriteLine("Starting");
-            var stopwatch = Stopwatch.StartNew();
-            // Start an array of consumers
-            Thread[] consumerArray = new Thread[numOfConsumerThreads];
-            for (int i = 0; i < consumerArray.Length; i++)
-            {
-                QueueConsumer consumer = new QueueConsumer(connection, _countdown);
-                consumerArray[i] = new Thread(new ThreadStart(consumer.Listen));
-                consumerArray[i].Start();
-            }
-            // Start an array of publishers
-            Thread[] publisherArray = new Thread[numOfPublishThreads];
-            for (int i = 0; i < publisherArray.Length; i++)
-            {
-                QueuePublisher publisher = new QueuePublisher( target, connection);
-                publisherArray[i] = new Thread(new ThreadStart(publisher.Publish));
-                publisherArray[i].Start();
-            }
-
-            for (int i = 0; i < publisherArray.Length; i++)
-            {
-                publisherArray[i].Join();
-            }
-            _countdown.Wait();
-            Console.WriteLine($"DONE: {stopwatch.ElapsedMilliseconds}, {_countdown.CurrentCount}" );
-        }
-    }*/
-
+   
     class Program
     {
         static CountdownEvent _countdown;
@@ -138,26 +34,20 @@ namespace ThreadTests
             services.AddTransient<IConsumer,Consumer>();
             provider = services.BuildServiceProvider();
             // The below does NOT change for RMQ or ASB
-      /*      IPublisher publisher = provider.GetRequiredService<IPublisher>();
-            IConsumer consumer = provider.GetRequiredService<IConsumer>();
-            string message = "sdjhflsdkjhflsadkfhsldjfhsdlkjfhsdlkjfhsdlkjfhsdlkjfhsdlkjfhsdlkfjhdlkjgfhdljghdlghsdlfkjghdlkgjhdflkjghdlkjghdljghdlfkjghdlskjghdlkjghdlfkjghdlkjghdlkfjghdslfkjghdslkfjghdlskjghdlkgjhdflkjghdlfkjghdlkfjghdflkgjhdsflkjghdlfkgjhdlfjghdslkgjhdslgjhdslgjhsdlgjhdslkgjhdslkgjhdlkgjhdlfjghdlfkjghdlkfjghdlfgjhdlfkjghldfjghlsdfjghdlfgjhdslkfgjhdlkfjghdslkfhgdlkfsjghdslkfjghldksfjghdlfkgjhdlskfgjhdlkgjhdslkjghdslkjghldskjghlsdkgjhsdlkghsdlkghdslkfghjdlfjghdlfjghldfjghldkhglksdjhgfsdljhgsldkgjhdslkgjhdslfkjghdslkfgjhsdlkgjhsdlkfgjhsdlfkjghdslfkjghsdlkgjhdslkfjghdslkfjghdslkfjghdsklfjghdslfkjghdflkjghsldkgjhdslkfgjhsdlkgjhdlkfgjhdlgkjhdlkfgjhdflkgjhdflkgjhdlkgjhdglkjhglkdfsjhgdlfkjghldskjghdslkjgfhsdklfjghdlkfjghdlfkjghslkgjhdlfkjghsdlkfjgh";
-            var body = Encoding.UTF8.GetBytes(message);
-            consumer.ReceiveAsync((x) =>
-            {
-                var message = Encoding.UTF8.GetString(x);
-                Console.WriteLine(message);
-                return true;
-            });
-            publisher.Publish(body);*/
-
-
-
-            int numOfPublishThreads = 1;
-            int numOfConsumerThreads = 2;
-            _countdown = new CountdownEvent(1000000 * numOfPublishThreads);
-
-            Console.WriteLine("Starting");
             var stopwatch = Stopwatch.StartNew();
+            Console.WriteLine("Starting");
+            InitializeConsumersAndProducers(1, 2, 1000);
+            _countdown.Wait();
+            Console.WriteLine($"DONE: {stopwatch.ElapsedMilliseconds}, {_countdown.CurrentCount}");
+        }
+        /// <summary>
+        /// This is messaging implementation agnostic
+        /// </summary>
+        /// <param name="numOfPublishThreads"></param>
+        /// <param name="numOfConsumerThreads"></param>
+        static void InitializeConsumersAndProducers (int numOfPublishThreads = 1, int numOfConsumerThreads = 2, int numOfMessages=1000)
+        {
+            _countdown = new CountdownEvent(numOfMessages * numOfPublishThreads);
             // Start an array of consumers
             Thread[] consumerArray = new Thread[numOfConsumerThreads];
             for (int i = 0; i < consumerArray.Length; i++)
@@ -169,16 +59,14 @@ namespace ThreadTests
             Thread[] publisherArray = new Thread[numOfPublishThreads];
             for (int i = 0; i < publisherArray.Length; i++)
             {
-                publisherArray[i] = new Thread(new ThreadStart(StartPublisher));
-                publisherArray[i].Start();
+                publisherArray[i] = new Thread(StartPublisher);
+                publisherArray[i].Start(numOfMessages);
             }
 
             for (int i = 0; i < publisherArray.Length; i++)
             {
                 publisherArray[i].Join();
             }
-            _countdown.Wait();
-            Console.WriteLine($"DONE: {stopwatch.ElapsedMilliseconds}, {_countdown.CurrentCount}");
         }
 
         static void StartConsumer ()
@@ -193,18 +81,18 @@ namespace ThreadTests
             });
         }
 
-        static void StartPublisher()
+        static void StartPublisher(object data)
         {
             IPublisher publisher = provider.GetRequiredService<IPublisher>();
             var tickStart = Environment.TickCount64;
             string message = "sdjhflsdkjhflsadkfhsldjfhsdlkjfhsdlkjfhsdlkjfhsdlkjfhsdlkjfhsdlkfjhdlkjgfhdljghdlghsdlfkjghdlkgjhdflkjghdlkjghdljghdlfkjghdlskjghdlkjghdlfkjghdlkjghdlkfjghdslfkjghdslkfjghdlskjghdlkgjhdflkjghdlfkjghdlkfjghdflkgjhdsflkjghdlfkgjhdlfjghdslkgjhdslgjhdslgjhsdlgjhdslkgjhdslkgjhdlkgjhdlfjghdlfkjghdlkfjghdlfgjhdlfkjghldfjghlsdfjghdlfgjhdslkfgjhdlkfjghdslkfhgdlkfsjghdslkfjghldksfjghdlfkgjhdlskfgjhdlkgjhdslkjghdslkjghldskjghlsdkgjhsdlkghsdlkghdslkfghjdlfjghdlfjghldfjghldkhglksdjhgfsdljhgsldkgjhdslkgjhdslfkjghdslkfgjhsdlkgjhsdlkfgjhsdlfkjghdslfkjghsdlkgjhdslkfjghdslkfjghdslkfjghdsklfjghdslfkjghdflkjghsldkgjhdslkfgjhsdlkgjhdlkfgjhdlgkjhdlkfgjhdflkgjhdflkgjhdlkgjhdglkjhglkdfsjhgdlfkjghldskjghdslkjgfhsdklfjghdlkfjghdlfkjghslkgjhdlfkjghsdlkfjgh";
             var body = Encoding.UTF8.GetBytes(message);
-            for (int x = 0; x <= 1000000; x++)
+            for (int x = 0; x <= (int)data; x++)
             {
                 publisher.Publish(body);
             }
             var tickEnd = Environment.TickCount64;
-            Console.WriteLine($"Published {1000000} messages in {tickEnd - tickStart} ms");
+            Console.WriteLine($"Published {(int)data} messages in {tickEnd - tickStart} ms");
         }
     }
 }
